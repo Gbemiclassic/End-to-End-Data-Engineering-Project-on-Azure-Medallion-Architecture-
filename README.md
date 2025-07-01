@@ -1,48 +1,61 @@
-🏗️ End-to-End Data Engineering Project on Azure (Lakehouse Architecture)
-This project demonstrates a complete modern data engineering pipeline using Azure services, following the Bronze → Silver → Gold layered architecture. The pipeline is dynamic and metadata-driven, enabling scalable ingestion, transformation, and analytics with Azure Data Factory, Databricks, Azure Synapse Analytics, and Power BI.
+# 🏗️ End-to-End Data Engineering Project on Azure (Lakehouse Architecture)
+<p align="center">
+<img src="https://github.com/Gbemiclassic/DE_Project/blob/main/architecture_diagram.png" alt="Azure Data Engineering Architecture" width="600" height="380">
 
-📌 Architecture Overview
-![image](https://github.com/user-attachments/assets/bb65ab28-456e-47b7-9b13-dd2b60ca620a)
+## 📋 Table of Contents
+- [Project Overview](#project-overview)
+- [Architecture Overview](#architecture-overview)
+- [🔧 Tools & Technologies Used](#-tools--technologies-used)
+- [🔹 Bronze Layer – Raw Data Ingestion](#-bronze-layer--raw-data-ingestion)
+- [🥂 Silver Layer – Transformation with Databricks](#-silver-layer--transformation-with-databricks)
+- [🥇 Gold Layer – Synapse Analytics & Semantic Modeling](#-gold-layer--synapse-analytics--semantic-modeling)
+- [📊 Power BI – Reporting](#-power-bi--reporting)
+- [✅ Highlights](#-highlights)
 
+***
 
-🛠️ Tools & Technologies Used
-Azure Data Factory – Metadata-driven, parameterized pipeline for scalable ingestion.
+## Project Overview
+This project demonstrates a complete modern data engineering pipeline using Azure services, following the Bronze → Silver → Gold layered architecture. The pipeline is dynamic and metadata-driven, enabling scalable ingestion, transformation, and analytics using Azure Data Factory, Databricks, Synapse Analytics, and Power BI.
 
-Azure Data Lake Gen2 – Storage layers (Bronze, Silver, Gold).
+## Architecture Overview
+This project follows the Lakehouse Architecture pattern with the following components:
+- Ingestion via Azure Data Factory from HTTP API.
+- Bronze layer for raw data storage.
+- Databricks for transformation into Silver layer.
+- Synapse for business logic and Gold layer modeling.
+- Power BI for reporting.
 
-Visual Studio Code – Created metadata JSON file to control pipeline logic.
+***
 
-Azure Databricks – PySpark-based transformation, stored outputs in Parquet format.
+## 🔧 Tools & Technologies Used
+- **Azure Data Factory**: Metadata-driven, parameterized pipeline for scalable ingestion.
+- **Azure Data Lake Gen2**: Storage layers (Bronze, Silver, Gold).
+- **Visual Studio Code**: Created JSON metadata file to control pipeline logic.
+- **Azure Databricks**: PySpark-based transformation, outputs stored in Parquet.
+- **Azure Synapse Analytics**: Serverless SQL for modeling, views, and external tables.
+- **Power BI**: Reporting and dashboarding layer.
+- **Azure Managed Identity**: Secure authentication across services.
 
-Azure Synapse Analytics (Serverless SQL) – Created views, external tables with business logic.
+***
 
-Power BI – Reporting and visualization on Gold layer.
+## 🔹 Bronze Layer – Raw Data Ingestion
+**Goal:** Ingest multiple CSV files from an HTTP API using a dynamic, metadata-driven pipeline.
 
-Azure Managed Identity – Secure authentication with scoped credentials.
-
-🔸 Bronze Layer – Raw Data Ingestion
-Goal: Ingest multiple CSV files from an HTTP-based API using a dynamic, metadata-driven pipeline.
-
-✅ Key Steps:
-Created a metadata .json file in VS Code listing all the API files:
-
-json
-Copy
-Edit
+### Key Steps:
+- Created a JSON file in VS Code containing parameters like `p_relative_url`, `p_sink_folder`, and `p_filename` for each dataset.
+```json
 {
   "p_relative_url": "Gbemiclassic/DE_Project/refs/heads/main/AdventureWorks_Returns.csv",
   "p_sink_folder": "Returns",
   "p_filename": "Returns.csv"
 }
-Defined Base_URL in a linked service.
+```
+- Defined `Base_URL` in linked service.
+- Created parameterized dataset with `Rel_URL` and `Sink_Folder`.
+- Used Lookup activity to read JSON (unchecked "First Row Only").
+- Connected a ForEach loop to run a Copy activity for each file..
 
-Created a parameterized dataset with Rel_URL and Sink_Folder.
-
-Used Lookup activity to read the JSON (unchecked First Row Only).
-
-Connected a ForEach loop to run a Copy activity for each file.
-
-Parameter mapping example:
+#### Parameter Mapping Example:
 
 Source → item().p_relative_url
 
@@ -50,48 +63,53 @@ Sink folder → item().p_sink_folder
 
 💡 Result: A scalable and reusable ingestion pipeline that loaded all files into structured folders in the Bronze container of ADLS Gen2.
 
-🥈 Silver Layer – Transformation with Databricks
-Goal: Clean, standardize, and optimize raw data from Bronze.
+***
 
-✅ Key Steps:
-Created an Azure App Registration (SPN) and assigned it Storage Blob Data Contributor access on ADLS Gen2.
+## 🥂 Silver Layer – Transformation with Databricks
+**Goal:** Clean, standardize, and optimize raw data from Bronze.
 
-Used Databricks to:
+### Key Steps:
+- Registered an Azure App (SPN) with `Storage Blob Data Contributor` role.
+- In Databricks:
+  - Authenticated with SPN credentials.
+  - Loaded raw data using PySpark.
+  - Cleaned, casted types, handled nulls, and enriched data.
+  - Wrote transformed data as Parquet into Silver container.
 
-Authenticate using the SPN credentials.
+The notebook used for the silver layer transformation can be found here 
+**Result:** Efficient, analytics-ready data stored in optimized columnar format.
 
-Load raw data from Bronze using PySpark.
+***
 
-Clean, cast types, handle nulls, and perform light joins or enrichment.
+## 🥇 Gold Layer – Synapse Analytics & Semantic Modeling
+**Goal:** Create business-curated data layer and enable external access.
 
-Wrote cleaned datasets as Parquet files to the Silver container.
+### Business Logic:
+- Created a serverless database
+- Created SQL views in the dbo schema from Silver layer using `OPENROWSET`:
 
-💡 Result: Efficient, analytics-ready data stored in a columnar format for fast querying and scalability.
+Sample Query
+```sql
+CREATE VIEW gold.sales AS
+SELECT *
+FROM OPENROWSET (
+    BULK 'https://awstorageadls.dfs.core.windows.net/silver/Sales/',
+    FORMAT = 'PARQUET'
+) AS sales;
+```
+- Denormalized products table to include the product categories and subcategories.
+- Derived other fields based on business requirements e.g. income categories from raw income values.
 
-🥇 Gold Layer – Synapse Analytics & Semantic Modeling
-Goal: Apply business logic, create curated datasets, and enable external access for BI tools.
-
-✅ Synapse Setup:
-Created Serverless SQL Database
-
-Created a Master Key
-
-sql
-Copy
-Edit
+### Synapse Setup:
+```sql
+-- Create Master Key
 CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'StrongPasswordHere';
-Created a Database Scoped Credential
 
-sql
-Copy
-Edit
+-- Create Scoped Credential
 CREATE DATABASE SCOPED CREDENTIAL cred_synapse
 WITH IDENTITY = 'Managed Identity';
-Created External Data Sources
 
-sql
-Copy
-Edit
+-- Create External Data Sources
 CREATE EXTERNAL DATA SOURCE source_silver
 WITH (
     LOCATION = 'https://awstorageadls.dfs.core.windows.net/silver',
@@ -103,40 +121,21 @@ WITH (
     LOCATION = 'https://awstorageadls.dfs.core.windows.net/gold',
     CREDENTIAL = cred_synapse
 );
-Defined External File Format
 
-sql
-Copy
-Edit
+-- Create File Format
 CREATE EXTERNAL FILE FORMAT format_parquet
 WITH (
     FORMAT_TYPE = PARQUET,
     DATA_COMPRESSION = 'org.apache.hadoop.io.compress.SnappyCodec'
 );
-✅ Business Logic:
-Created SQL Views in the dbo schema from the Parquet files in Silver using OPENROWSET:
+```
 
-sql
-Copy
-Edit
-CREATE VIEW gold.sales AS
-SELECT *
-FROM OPENROWSET (
-    BULK 'https://awstorageadls.dfs.core.windows.net/silver/Sales/',
-    FORMAT = 'PARQUET'
-) AS sales;
-Denormalized tables (e.g., products with categories and subcategories).
 
-Created derived fields like income categories from raw income values.
+### Gold Tables:
+- Created external tables using CREATE EXTERNAL TABLE ... AS SELECT from views:
 
-✅ External Tables for Gold Layer:
-Created gold schema.
-
-Created external tables using CREATE EXTERNAL TABLE ... AS SELECT from views:
-
-sql
-Copy
-Edit
+Sample Query
+```sql
 CREATE EXTERNAL TABLE gold.extsales
 WITH (
     LOCATION = 'extsales',
@@ -144,22 +143,27 @@ WITH (
     FILE_FORMAT = format_parquet
 ) AS
 SELECT * FROM gold.sales;
-💡 Result: Gold layer tables now query-ready for downstream applications with fast, scalable access.
+```
 
-📊 Power BI – Reporting on Gold Layer
-Connected Power BI to Azure Synapse Serverless SQL.
+**Result:** Query-optimized, business-curated datasets accessible by downstream tools.
 
-Loaded Gold external tables as datasets.
+***
 
-Built visuals showing trends, KPIs, and actionable insights.
+## 📊 Power BI – Reporting
+- Connected Power BI to Synapse Serverless SQL.
+- Loaded Gold external tables.
+- Built dashboards to visualize KPIs, trends, and insights.
 
-✅ Highlights
-✅ Scalable, metadata-driven ingestion using Lookup and ForEach.
+***
 
-✅ Clean separation of concerns across Bronze → Silver → Gold.
+## ✅ Highlights
+- Scalable, **metadata-driven ingestion** using Lookup and ForEach.
+- Clear separation: **Bronze → Silver → Gold**.
+- Secure, **SPN-based Databricks** authentication.
+- Fast, scalable querying using **Parquet + Synapse External Tables**.
+- **Power BI** reporting powered by a robust data foundation.
 
-✅ SPN-based secure authentication for Databricks.
+---
 
-✅ Efficient querying and modeling with Synapse external tables and views.
+# <p align="center">Thank you for reading! 😎</p>
 
-✅ Power BI dashboards built on optimized Gold layer data.
