@@ -38,7 +38,7 @@ This project follows the Lakehouse Architecture pattern with the following compo
 
 ***
 
-## 🔹 Bronze Layer – Raw Data Ingestion
+## 🥉 Bronze Layer – Raw Data Ingestion
 **Goal:** Ingest multiple CSV files from an HTTP API using a dynamic, metadata-driven pipeline.
 
 ### Key Steps:
@@ -65,7 +65,7 @@ Sink folder → item().p_sink_folder
 
 ***
 
-## 🥂 Silver Layer – Transformation with Databricks
+## 🥈 Silver Layer – Transformation with Databricks
 **Goal:** Clean, standardize, and optimize raw data from Bronze.
 
 ### Key Steps:
