@@ -76,7 +76,6 @@ Sink folder → item().p_sink_folder
   - Cleaned, casted types, handled nulls, and enriched data.
   - Wrote transformed data as Parquet into Silver container.
 
-The notebook used for the silver layer transformation can be found here 
 **Result:** Efficient, analytics-ready data stored in optimized columnar format.
 
 ***
