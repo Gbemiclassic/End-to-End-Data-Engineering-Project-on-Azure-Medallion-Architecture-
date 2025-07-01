@@ -1,4 +1,4 @@
-# 🏗️ End-to-End Data Engineering Project on Azure (Lakehouse Architecture)
+# 🏗️ End-to-End Data Engineering Project on Azure (Medallion Architecture)
 <p align="center" style="margin-bottom: 0px !important;">
 <img src="https://github.com/Gbemiclassic/End-to-End-Data-Engineering-Project-on-Azure-Medallion-Architecture-/blob/main/Architecture.jpg" alt="Image">
 
@@ -18,7 +18,7 @@
 This project demonstrates a complete modern data engineering pipeline using Azure services, following the Bronze → Silver → Gold layered architecture. The pipeline is dynamic and metadata-driven, enabling scalable ingestion, transformation, and analytics using Azure Data Factory, Databricks, Synapse Analytics, and Power BI.
 
 ## Architecture Overview
-This project follows the Lakehouse Architecture pattern with the following components:
+This project follows the Medallion Architecture pattern with the following components:
 - Ingestion via Azure Data Factory from HTTP API.
 - Bronze layer for raw data storage.
 - Databricks for transformation into Silver layer.
