@@ -1,6 +1,7 @@
 # 🏗️ End-to-End Data Engineering Project on Azure (Lakehouse Architecture)
 <p align="center">
-<img src="https://github.com/Gbemiclassic/DE_Project/blob/main/architecture_diagram.png" alt="Azure Data Engineering Architecture" width="600" height="380">
+<img src="![image](https://github.com/user-attachments/assets/676d2c70-27f7-4850-b35b-4c83245688df)
+" alt="Azure Data Engineering Architecture" width="600" height="380">
 
 ## 📋 Table of Contents
 - [Project Overview](#project-overview)
