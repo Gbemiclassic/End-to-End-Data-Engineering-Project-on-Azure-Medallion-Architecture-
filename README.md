@@ -1,6 +1,6 @@
 # 🏗️ End-to-End Data Engineering Project on Azure (Lakehouse Architecture)
 <p align="center" style="margin-bottom: 0px !important;">
-<img src="https://github.com/Gbemiclassic/End-to-End-Data-Engineering-Project-on-Azure-Medallion-Architecture-/blob/main/Architecture.jpg" alt="Image" width="500" height="520">
+<img src="https://github.com/Gbemiclassic/End-to-End-Data-Engineering-Project-on-Azure-Medallion-Architecture-/blob/main/Architecture.jpg" alt="Image">
 
 ## 📋 Table of Contents
 - [Project Overview](#project-overview)
